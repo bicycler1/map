@@ -1,0 +1,39 @@
+.large{
+    width: 230px;
+    font-size: 1.6rem;
+}
+.large-header{
+    width: 100%;
+    height: 60px;
+}
+.large-fold {
+    width: 100%;
+}
+.normal{
+    width: 180px;
+    font-size: 1.2rem;
+}
+.normal-header{
+    width: 100%;
+    height: 30px;
+}
+.normal-fold {
+    width: 100%;
+}
+.small{
+    width: 60px;
+    font-size: 0.6rem;
+}
+.small-header{
+    width: 100%;
+    height: 30px;
+}
+.small-fold {
+    width: 100%;
+}
+.button-margin{
+    margin: 6px 0 0 6px;
+}
+.button-color{
+    background: #1890ff;
+}
