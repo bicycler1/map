@@ -13,7 +13,8 @@
       @close="rightDrawerClose"
       :visible="rightDrawerVisible"
     >
-      hhhhhhh
+      <div id="echartsPie">
+      </div>
     </a-drawer>
   </div>
 </template>
@@ -43,6 +44,8 @@
 </style>
 
 <script>
+import echarts from 'echarts'
+
 export default {
   name: 'foldcontent',
   props: [
@@ -178,14 +181,42 @@ export default {
     },
     showDrawer: function () {
       let that = this
+      this.rightDrawerVisible = true
       setTimeout(function () {
-        that.rightDrawerVisible = true
-      })
+        that.rightDrawer()
+      }, 100)
     },
     rightDrawerClose: function () {
       this.rightDrawerVisible = false
       this.removeAllMarker(this.GLOBAL.map, this.GLOBAL.markerArr)
       this.multMarker(this.GLOBAL.siteList)
+    },
+    rightDrawer: function () {
+      this.changeRightStyle()
+      this.drawPie()
+    },
+    changeRightStyle: function () {
+      let element = $('.ant-drawer-wrapper-body')[0]
+      element.style.width = '400px'
+    },
+    drawPie: function () {
+      let echartsPie = echarts.init(document.getElementById('echartsPie'))
+      echartsPie.setOption({
+        series: [
+          {
+            name: '访问来源',
+            type: 'pie',
+            radius: '55%',
+            data: [
+              { value: 235, name: '视频广告' },
+              { value: 274, name: '联盟广告' },
+              { value: 310, name: '邮件营销' },
+              { value: 335, name: '直接访问' },
+              { value: 400, name: '搜索引擎' }
+            ]
+          }
+        ]
+      })
     }
   },
   mounted () {
