@@ -60,7 +60,7 @@ export default {
         'trip': ['长沙', '武汉'],
         'eat': ['', '武汉'],
         'wh': ['武汉星海智慧小区', '武汉天地智慧小区'],
-        'gz': ['广州智慧小区', '广州智慧小区'],
+        'gz': ['广州人民公园智慧小区', '广州博物馆智慧小区'],
         'cs': ['长沙IFS智慧小区', '长沙IFS智慧小区']
       },
       butType: [' btn-primary', ' btn-success', ' btn-info', ' btn-warning', ' btn-danger', ' btn-default'],
