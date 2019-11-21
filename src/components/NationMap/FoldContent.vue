@@ -114,7 +114,6 @@ export default {
       photos: Object,
       describeContent: String,
       gallery: Object,
-      galleryInit: 1
     }
   },
   methods: {
@@ -279,7 +278,7 @@ export default {
       let that = this
       let element = $('.ant-drawer-content-wrapper')
       element.css({ width: '430px' })
-      if (this.galleryInit === 1) {
+      if (this.GLOBAL.galleryInit === 1) {
         // 初始化viewerjs，同时setTimeOut保证接下来的函数在that.addPhotos(parentOrder, i)函数之后执行
         setTimeout(() => {
           that.gallery = new Viewer(document.getElementById('images'), {
@@ -292,7 +291,7 @@ export default {
             minZoomRatio: 0.03, // 最小缩放比例
             maxZoomRatio: 3 // 最大缩放比例
           })
-          that.galleryInit++
+          that.GLOBAL.galleryInit++
         }, 0)
       } else {
         setTimeout(() => {

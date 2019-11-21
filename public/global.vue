@@ -9,6 +9,9 @@ let FoldContentMountedNum = 0
 let FoldChildButtonHeight = []
 let FoldChildVisib = []
 
+// galleryInit在右侧栏图片更新时候使用
+let galleryInit = 1
+
 // 百度地图相关变量
 let map = Object
 let markerArr = []
@@ -257,6 +260,7 @@ export default {
   FoldContentMountedNum,
   FoldChildButtonHeight,
   FoldChildVisib,
+  galleryInit,
   map,
   siteList,
   markerArr,
