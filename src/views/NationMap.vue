@@ -1,10 +1,9 @@
 <template>
   <div>
-    <div id="map">
-
+    <div id="map" >
     </div>
     <div class="fold">
-      <Fold type="normal" msg="海尔智慧小区">
+      <Fold type="normal" msg="政政&火火的星辰大海">
       </Fold>
     </div>
   </div>
@@ -24,13 +23,12 @@
 
 <script>
 import fold from '@/components/NationMap/Fold'
-import foldcontent from '@/components/NationMap/FoldContent'
-let map
+import path from 'path'
+
 export default {
   name: 'nationMap',
   components: {
-    Fold: fold,
-    FoldContent: foldcontent
+    Fold: fold
   },
   data () {
     return {
@@ -39,7 +37,12 @@ export default {
     }
   },
   methods: {
-
+    scrollFunc: function () {
+      let that = this
+      setTimeout(() => {
+        that.GLOBAL.zoom = that.GLOBAL.map.getZoom()
+      }, 800)
+    }
   },
   mounted () {
     let map = new BMap.Map('map')
@@ -56,7 +59,11 @@ export default {
     map.addControl(new BMap.MapTypeControl(opts))
     map.setCurrentCity('北京')
     map.enableScrollWheelZoom(true) // 开启鼠标滚轮缩放
-    // 创建坐标点
+
+    // for Chrome and IE
+    this.GLOBAL.Functions.addEvent(document, 'mousewheel', this.scrollFunc)
+    // for FireFox
+    this.GLOBAL.Functions.addEvent(document, 'DOMMouseScroll', this.scrollFunc)
   }
 }
 </script>

@@ -4,13 +4,12 @@
     </div>
     <div class="list-frame">
       <div>
-        <router-link :to="{ name: 'nationwide-map' }">
+        <router-link target="_blank" :to="{ name: 'nationwide-map' } ">
           <a-button type="primary" size="large">政政&火火一起去看星辰大海</a-button>
         </router-link>
-        <router-link :to="{ name: 'nationwide-map' }">
+        <router-link target="_blank" :to="{ name: 'nationwide-map' }">
           <a-button type="primary" size="large">政政&火火一起去看星辰大海</a-button>
         </router-link>
-
       </div>
     </div>
     <div class="zz-img" @mousedown="movezzhhDown($event)" @mousemove="movezzhhMove($event)" @mouseup="movezzhhUp($event)">
@@ -18,6 +17,13 @@
     </div>
     <div class="hh-img" @mousedown="movezzhhDown($event)" @mousemove="movezzhhMove($event)" @mouseup="movezzhhUp($event)">
       <img src="../assets/index/hh.png" alt="按下鼠标，移动我们试试看(＾Ｕ＾)">
+    </div>
+    <div class="kong-ming-video">
+    </div>
+    <div class="hand-in-hand-video">
+    </div>
+    <div class="let-go-video">
+
     </div>
   </div>
 </template>
@@ -70,6 +76,32 @@
   .zz-img,.hh-img{
     cursor: pointer;
     z-index: 0;
+  }
+  .hand-in-hand-video{
+    position: absolute;
+    top: 5%;
+    left: 50%;
+    width: 160px;
+    height: 160px;
+    margin-left: -100px;
+    text-align: center;
+    color: #fff;
+    background: url("../assets/index/loveHeart.png") center center no-repeat;
+    background-size: 100% auto;
+    display: none;
+  }
+  .kong-ming-video{
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width:1000px;
+    height: 300px;
+    margin-left: -500px;
+    text-align: center;
+    color: #fff;
+    background: url("../assets/index/Kongming-Lantern.gif") center center no-repeat;
+    background-size: auto 100%;
+    display: none;
   }
 </style>
 
@@ -125,6 +157,13 @@ export default {
           if ((allLength - this.screenWidth) > 31) {
             zzLeft = elementzzLeft
             hhRight = elementhhRight
+            this.GLOBAL.isClose += 1
+            if (this.GLOBAL.isClose == 1) {
+              $('.hand-in-hand-video').fadeIn(500)
+              $('.hand-in-hand-video').promise().done(function () {
+                $('.kong-ming-video').fadeIn(0)
+              })
+            }
           } else {
             if (hhRight < 20) {
               hhRight = 20
@@ -142,6 +181,13 @@ export default {
           if ((allLength - this.screenWidth) > 31) {
             zzLeft = elementzzLeft
             hhRight = elementhhRight
+            this.GLOBAL.isClose += 1
+            if (this.GLOBAL.isClose == 1) {
+              $('.hand-in-hand-video').fadeIn(500)
+              $('.hand-in-hand-video').promise().done(function () {
+                $('.kong-ming-video').fadeIn(0)
+              })
+            }
           } else {
             if (hhRight < 20) {
               hhRight = 20
@@ -157,6 +203,9 @@ export default {
     },
     movezzhhUp: function () {
       if (this.ifMouseDown) {
+        this.GLOBAL.isClose = 0
+        $('.hand-in-hand-video').fadeOut(200)
+        $('.kong-ming-video').fadeOut(300)
         this.ifMouseDown = 0
         this.elementzz.css({ 'left': this.zzLeft + 'px' })
         this.elementhh.css({ 'right': this.hhRight + 'px' })

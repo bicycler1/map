@@ -5,9 +5,8 @@
       <a-icon id="icon" :type=iconType />
     </div>
     <div class="fold-content">
-      <FoldContent slot="trip" name="wh" @foldChild="foldChild()"></FoldContent>
-      <FoldContent slot="eat1" name="gz" @foldChild="foldChild()"></FoldContent>
-      <FoldContent slot="eat2" name="cs" @foldChild="foldChild()"></FoldContent>
+      <FoldContent class="fold-child-frame" name="trip" @foldChild="foldChild()"></FoldContent>
+      <FoldContent class="fold-child-frame" name="eat" @foldChild="foldChild()"></FoldContent>
     </div>
   </div>
 </template>
@@ -22,8 +21,9 @@
     left: 0;
     display: flex;
     align-items: center;
-    background: rgba(0,160,255,0.9);
-    border-radius: 10px;
+    background: rgba(2,76,111,0.9);
+    border-radius: 10px 10px 0 0;
+    border-bottom: 2px solid #e2c029;
     cursor: pointer;
   }
   .fold-header>div{
@@ -38,10 +38,13 @@
     position: relative;
     top: 0;
     left: 0;
-    background: rgba(0,160,255,0.9);
-    border-radius: 10px;
+    background: rgba(54,156,205,0.9);
+    border-radius: 0 0 10px 10px;
     transition: height .7s linear;
     overflow: hidden;
+  }
+  .fold-child-frame{
+    margin: 13px 0 13px 0;
   }
 </style>
 
@@ -51,7 +54,6 @@ import foldcontent from '@/components/NationMap/FoldContent'
 export default {
   name: 'fold',
   components: {
-    Fold: fold,
     FoldContent: foldcontent
   },
   props: [
@@ -67,12 +69,12 @@ export default {
   methods: {
     computeHeight: function () {
       let height = 0
-      let i
-      for (i = 0; i < this.GLOBAL.FoldChildHeight.length; i++) {
-        let h = parseInt(this.GLOBAL.FoldChildHeight[i]) * parseInt(this.GLOBAL.FoldChildVisib[i])
+      for (let i = 0; i < this.GLOBAL.FoldChildButtonHeight.length; i++) {
+        let h = parseInt(this.GLOBAL.FoldChildButtonHeight[i]) * parseInt(this.GLOBAL.FoldChildVisib[i])
         height += h
       }
-      height += (13 + 36) * this.GLOBAL.FoldChildHeight.length
+      height += (13 + 40) * this.GLOBAL.FoldChildButtonHeight.length
+      height += 13
       return height
     },
     foldChild: function () {
@@ -81,16 +83,16 @@ export default {
     },
     fold: function (ev) {
       let element = ev.currentTarget || ev.srcElement
-      let foldElement = element.nextSibling
+      let foldElement = $(element).next()
       let height = this.computeHeight()
       if (this.visib == 0) {
         this.visib = 1
         this.iconType = 'up'
-        $(foldElement).css({ 'height': height + 'px' })
+        foldElement.css({ 'height': height + 'px' })
       } else {
         this.visib = 0
         this.iconType = 'down'
-        $(foldElement).css({ 'height': 0 + 'px' })
+        foldElement.css({ 'height': 0 + 'px' })
       }
     },
     mountedFunction: function () {

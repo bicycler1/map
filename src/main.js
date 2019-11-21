@@ -8,14 +8,20 @@ import store from './store'
 import 'normalize.css/normalize.css'
 // 引入boostrap的css文件
 import 'bootstrap/dist/css/bootstrap.min.css'
+// 引入viewerjs的css文件
+import 'viewerjs/dist/viewer.min.css'
 // 引入fontawesome
 import 'font-awesome/css/font-awesome.min.css'
 // 引入antDesign
 import antd from 'ant-design-vue'
 import 'ant-design-vue/dist/antd.min.css'
 import $ from 'jquery'
-//引入global全局变量
+// 引入global全局变量
 import global from '../public/global'
+
+// simpleLightbox导入
+import 'simplelightbox/dist/simplelightbox.min.css'
+import 'simplelightbox/dist/simple-lightbox.min'
 
 Vue.config.productionTip = false
 Vue.use(antd)

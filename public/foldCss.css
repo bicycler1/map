@@ -10,19 +10,19 @@
     width: 100%;
 }
 .normal{
-    width: 180px;
-    font-size: 1.2rem;
+    width: 200px;
+    font-size: 1.4rem;
 }
 .normal-header{
     width: 100%;
-    height: 30px;
+    height: 40px;
 }
 .normal-fold {
     width: 100%;
 }
 .small{
-    width: 60px;
-    font-size: 0.6rem;
+    width: 170px;
+    font-size: 1rem;
 }
 .small-header{
     width: 100%;
@@ -35,5 +35,5 @@
     margin: 6px 0 0 6px;
 }
 .button-color{
-    background: #1890ff;
+    background: #024c6f;
 }

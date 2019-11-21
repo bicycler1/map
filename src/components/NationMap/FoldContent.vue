@@ -1,37 +1,69 @@
 <template>
   <div>
     <div class="header" @click="foldChild($event)">
-      <a-button size="small" type="primary">{{type}}</a-button>
+      <button>{{type}}</button>
+      <div></div>
       <a-icon id="icon" :type=iconType />
     </div>
     <div class="content" :id=buttonContent>
     </div>
     <a-drawer
-      title="海尔智慧小区"
+      title="政政&火火的星辰大海"
       placement="right"
       :closable="false"
       @close="rightDrawerClose"
       :visible="rightDrawerVisible"
     >
-      <div id="echartsPie">
+      <p>
+        &ensp;&ensp;{{describeContent}}
+      </p>
+      <div>
+        <ul id="images">
+          <li v-for="(value,key,index) in photos">
+            <img :src=value.url :alt=value.alt>
+          </li>
+        </ul>
       </div>
     </a-drawer>
   </div>
 </template>
 
-<style scoped>
+<style lang="scss" scoped>
 .header{
   position: relative;
   display: flex;
   align-items: center;
-  height: 36px;
-  border-bottom: 1px solid #ddd;
-  margin-top: 13px;
+  height: 40px;
+  border-bottom: 1px solid #fff;
   cursor: pointer;
 }
 .header>button{
-    margin-left: 10px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: rgba(2, 80, 111, 0.6);
+  margin-left: 10px;
+  &:hover{
+    background: rgba(2, 80, 111, 0.9);
   }
+}
+@mixin headerIcon($order){
+  @if($order == 1){
+    background: url("../../assets/nationMap/markerTrip.png") center center no-repeat;
+  }
+  @else if($order == 2){
+    background: url("../../assets/nationMap/markerEat.png") center center no-repeat;
+  }
+  width: 30px;
+  height: 30px;
+  background-size: auto 100%;
+}
+.header-first-icon{
+  @include headerIcon(1)
+}
+.header-second-icon{
+  @include headerIcon(2)
+}
 .header>i{
   position: absolute;
   right: 10px;
@@ -40,11 +72,27 @@
   transition:  height .7s linear;
   overflow: hidden;
 }
-
+p{
+  text-align:justify;
+  text-justify: inter-character
+}
+#images{
+  padding: 0;
+}
+#images li{
+  display: inline-block;
+  margin: 10px 10px 0 0;
+}
+#images img{
+  max-height: 120px;
+  cursor: pointer;
+}
 </style>
 
 <script>
 import echarts from 'echarts'
+// 图片浏览
+import Viewer from 'viewerjs'
 
 export default {
   name: 'foldcontent',
@@ -57,34 +105,48 @@ export default {
       iconType: 'up',
       buttonContent: 'buttonContent',
       content: {
-        'trip': ['长沙', '武汉'],
-        'eat': ['', '武汉'],
-        'wh': ['武汉星海智慧小区', '武汉天地智慧小区'],
-        'gz': ['广州人民公园智慧小区', '广州博物馆智慧小区'],
-        'cs': ['长沙IFS智慧小区', '长沙IFS智慧小区']
+        'trip': ['湖南省博物馆', '湖南橘子洲', '湖南岳麓山', '湖南随拍'],
+        'eat': ['湖南坡子街', '湖南特色', '武汉静瑞亭']
       },
+      typeProps: Array,
       butType: [' btn-primary', ' btn-success', ' btn-info', ' btn-warning', ' btn-danger', ' btn-default'],
-      markerType: 'icon1',
-      rightDrawerVisible: false
+      rightDrawerVisible: false,
+      photos: Object,
+      describeContent: String,
+      gallery: Object,
+      galleryInit: 1
     }
   },
   methods: {
+    // 折叠操作，传入参数是事件绑定的对象
     foldChild: function (ev) {
       let element = ev.currentTarget || ev.srcElement
-      let num = parseInt(element.nextSibling.getAttribute('id').replace(/[^0-9]/ig, ''))
-      let foldElement = element.nextSibling
-      if (this.GLOBAL.FoldChildVisib[num] == 0) {
+      let num = parseInt($(element).next().attr('id').replace(/[^0-9]/ig, ''))
+      let foldElement = $(element).next()
+      if (this.GLOBAL.FoldChildVisib[num] === 0) {
         this.GLOBAL.FoldChildVisib[num] = 1
         this.iconType = 'up'
-        $(foldElement).css({ 'height': this.GLOBAL.FoldChildHeight[num] })
+        foldElement.css({ 'height': this.GLOBAL.FoldChildButtonHeight[num] })
       } else {
         this.GLOBAL.FoldChildVisib[num] = 0
         this.iconType = 'down'
-        $(foldElement).css({ 'height': 0 + 'px' })
+        foldElement.css({ 'height': 0 + 'px' })
       }
       this.$emit('foldChild')
     },
-    appendButton: function () {
+    // 添加header中的Icon图片
+    addHeaderIcon: function () {
+      switch (this.name) {
+        case 'trip':
+          $($('.header').children()[1]).addClass('header-first-icon')
+          break
+        case 'eat':
+          $($('.header').children()[4]).addClass('header-second-icon')
+          break
+      }
+    },
+    // 添加trip类和eat类下面的buttons
+    addButton: function () {
       let that = this
       let contents = this.content[this.name]
       let parent = '#' + this.buttonContent
@@ -92,28 +154,92 @@ export default {
         let className = 'btn btn-xs btn-primary'
         // 下面一行代码给出的是随机彩色的按钮
         // className += this.butType[Math.floor(Math.random() * this.butType.length)]
-        $('#' + this.buttonContent).append('<button type="button" class="button-margin ' + className + '"' + 'id="button' + i + '"' + '>' + contents[i] + '</button>')
+        $(parent).append('<button type="button" class="button-margin ' + className + '"' + 'id="button' + i + '"' + '>' + contents[i] + '</button>')
         $(parent + ' #button' + i).on('click', function () {
-          that.detialInfo(that.buttonContent.replace(/[^0-9]/ig, ''), i)
+          that.deletAndMarker(that.buttonContent.replace(/[^0-9]/ig, ''), i)
+          that.showDrawer(that.buttonContent.replace(/[^0-9]/ig, ''), i)
         })
       }
-      this.GLOBAL.FoldChildHeight.push($('#' + this.buttonContent).css('height'))
+      this.GLOBAL.FoldChildButtonHeight.push($('#' + this.buttonContent).css('height'))
       this.GLOBAL.FoldChildVisib.push(1)
-      $('#' + this.buttonContent).css({ 'height': this.GLOBAL.FoldChildHeight[this.GLOBAL.FoldChildHeight.length - 1] })
+      $('#' + this.buttonContent).css({ 'height': this.GLOBAL.FoldChildButtonHeight[this.GLOBAL.FoldChildButtonHeight.length - 1] })
     },
-    addButton: function () {
-      if (this.name == 'trip') {
-        this.appendButton()
-      } else if (this.name == 'eat') {
-        this.appendButton()
-      } else if (this.name == 'wh') {
-        this.appendButton()
-      } else if (this.name == 'gz') {
-        this.appendButton()
-      } else if (this.name == 'cs') {
-        this.appendButton()
+    // 添加多个标注点，传入的参数是包含坐标的类
+    multMarker: function (obj) {
+      for (let property in obj) {
+        switch (property) {
+          case 'trip':
+            // 给标注点设置不同的样式
+            this.multStyle(obj[property], 'trip')
+            break
+          case 'eat':
+            this.multStyle(obj[property], 'eat')
+            break
+        }
       }
     },
+    // 给标注点设置不同的样式，传入的参数是包含坐标的类、type：trip/eat
+    multStyle: function (obj, type) {
+      let active, normal
+      switch (type) {
+        case 'trip':
+          active = this.GLOBAL.iconTripActive
+          normal = this.GLOBAL.iconTrip
+          break
+        case 'eat':
+          active = this.GLOBAL.iconEatActive
+          normal = this.GLOBAL.iconEat
+          break
+      }
+      if (obj.hasOwnProperty('positions')) {
+        let positions = obj.positions
+        for (let i = 0; i < positions.length; i++) {
+          // 创建坐标点
+          let points = new BMap.Point(positions[i].lng, positions[i].lat)
+          if (positions[i].active) {
+            // 添加一个标注点
+            this.markerFun(this.GLOBAL.map, points, active)
+          } else {
+            this.markerFun(this.GLOBAL.map, points, normal)
+          }
+        }
+      }
+    },
+    // 添加一个标注点，传入的参数是地图对象、标注点对象、标注类型对象
+    markerFun: function (map, point, iconType) {
+      let that = this
+      let marker = new BMap.Marker(point, {
+        icon: iconType
+      })
+      // 新增一个this.GLOBAL.markerArr全局数组用于后来的removeMarker
+      this.GLOBAL.markerArr.push(marker)
+      let typeOrder, listOrder
+      map.addOverlay(marker)
+      marker.addEventListener('click', function () {
+        // 去除map上的所有标注点
+        that.removeAllMarker(that.GLOBAL.map, that.GLOBAL.markerArr)
+        that.GLOBAL.Functions.panAndZoom.call(that.GLOBAL, (new BMap.Point(this.point.lng, this.point.lat)))
+        for (let proprty in that.GLOBAL.siteList) {
+          let site = that.GLOBAL.siteList[proprty]
+          if (site.hasOwnProperty('positions')) {
+            for (let i = 0; i < site.positions.length; i++) {
+              if (site.positions[i].lng === this.point.lng && site.positions[i].lat === this.point.lat) {
+                // 1.获取所点击点的typeOrder：trip/eat，其中0=trip，1=eat。2.获取所点击点是typeOrder中的第几个
+                typeOrder = that.typeProps.indexOf(proprty)
+                if (typeOrder === -1) {
+                  typeOrder = 'undefined'
+                }
+                listOrder = i
+              }
+            }
+          }
+        }
+        // that.multMarker(that.GLOBAL.siteList)
+        that.deletAndMarker(typeOrder, listOrder)
+        that.showDrawer(typeOrder, listOrder)
+      })
+    },
+    // 去除map上所有标注点并且所有标注点的样式为非active，传入的参数是map对象、标注点的数组
     removeAllMarker: function (map, markerArr) {
       for (let proprty in this.GLOBAL.siteList) {
         let site = this.GLOBAL.siteList[proprty]
@@ -127,77 +253,73 @@ export default {
         map.removeOverlay(markerArr[i])
       }
     },
-    markerFun: function (map, point, iconType) {
-      let that = this
-      let marker = new BMap.Marker(point, {
-        icon: iconType
-      })
-      this.GLOBAL.markerArr.push(marker)
-      map.addOverlay(marker)
-      marker.addEventListener('click', function () {
-        that.GLOBAL.map.panTo(new BMap.Point(this.point.lng, this.point.lat))
-        that.removeAllMarker(that.GLOBAL.map, that.GLOBAL.markerArr)
-        for (let proprty in that.GLOBAL.siteList) {
-          let site = that.GLOBAL.siteList[proprty]
-          if (site.hasOwnProperty('positions')) {
-            for (let i = 0; i < site.positions.length; i++) {
-              if (site.positions[i].lng == this.point.lng && site.positions[i].lat == this.point.lat) {
-                site.positions[i].active = true
-              }
-            }
-          }
-        }
-        that.multMarker(that.GLOBAL.siteList)
-        that.showDrawer()
-      })
-    },
-    multMarker: function (obj) {
-      for (let property in obj) {
-        if (obj[property].hasOwnProperty('positions')) {
-          let positions = obj[property].positions
-          for (let i = 0; i < positions.length; i++) {
-            // 创建坐标点
-            let points = new BMap.Point(positions[i].lng, positions[i].lat)
-            if (positions[i].active) {
-              this.markerFun(this.GLOBAL.map, points, this.GLOBAL.icon1Active)
-            } else {
-              this.markerFun(this.GLOBAL.map, points, this.GLOBAL.icon1)
-            }
-          }
-        }
-      }
-    },
-    detialInfo: function (parentOrder, i) {
-      let typeList = Object.keys(this.GLOBAL.siteList)
-      let type = typeList[parentOrder]
+    deletAndMarker: function (typeOrder, listOrder) {
+      let type = this.typeProps[typeOrder]
       let typePosition = this.GLOBAL.siteList[type]
       if (typePosition.hasOwnProperty('positions')) {
+        // 去除map上多有标注点
         this.removeAllMarker(this.GLOBAL.map, this.GLOBAL.markerArr)
-        typePosition.positions[i].active = !typePosition.positions[i].active
+        typePosition.positions[listOrder].active = !typePosition.positions[listOrder].active
+        // 更新标注点
         this.multMarker(this.GLOBAL.siteList)
-        this.GLOBAL.map.panTo(new BMap.Point(typePosition.positions[i].lng, typePosition.positions[i].lat))
-        this.showDrawer()
+        // 移动视角
+        this.GLOBAL.Functions.panAndZoom.call(this.GLOBAL, (new BMap.Point(typePosition.positions[listOrder].lng, typePosition.positions[listOrder].lat)))
       }
     },
-    showDrawer: function () {
+    // 展示右边栏
+    showDrawer: function (typeOrder, listOrder) {
       let that = this
       this.rightDrawerVisible = true
       setTimeout(function () {
-        that.rightDrawer()
+        that.initRightDrawer()
+        that.addPhotos(typeOrder, listOrder)
       }, 100)
+    },
+    initRightDrawer: function () {
+      let that = this
+      let element = $('.ant-drawer-content-wrapper')
+      element.css({ width: '430px' })
+      if (this.galleryInit === 1) {
+        // 初始化viewerjs，同时setTimeOut保证接下来的函数在that.addPhotos(parentOrder, i)函数之后执行
+        setTimeout(() => {
+          that.gallery = new Viewer(document.getElementById('images'), {
+            toolbar: true,
+            tooltip: false,
+            movable: true,
+            rotatable: true,
+            scalable: false,
+            fullscreen: false,
+            minZoomRatio: 0.03, // 最小缩放比例
+            maxZoomRatio: 3 // 最大缩放比例
+          })
+          that.galleryInit++
+        }, 0)
+      } else {
+        setTimeout(() => {
+          that.gallery.update()
+        }, 0)
+      }
+      // this.drawPie()
+    },
+    addPhotos: function (typeOrder, listOrder) {
+      if (typeof (typeOrder) === 'string' && typeOrder !== 'undefined') {
+        typeOrder = parseInt(typeOrder)
+      }
+      if (this.GLOBAL.siteList[this.typeProps[typeOrder]].hasOwnProperty('photos')) {
+        let photoAll = this.GLOBAL.siteList[this.typeProps[typeOrder]].photos
+        let propsChild = Object.keys(photoAll)
+        this.photos = photoAll[propsChild[listOrder]]
+      }
+      if (this.GLOBAL.siteList[this.typeProps[typeOrder]].hasOwnProperty('describeContent')) {
+        let describeAll = this.GLOBAL.siteList[this.typeProps[typeOrder]].describeContent
+        let propsChild = Object.keys(describeAll)
+        this.describeContent = describeAll[propsChild[listOrder]]
+      }
     },
     rightDrawerClose: function () {
       this.rightDrawerVisible = false
       this.removeAllMarker(this.GLOBAL.map, this.GLOBAL.markerArr)
       this.multMarker(this.GLOBAL.siteList)
-    },
-    rightDrawer: function () {
-      this.changeRightStyle()
-      this.drawPie()
-    },
-    changeRightStyle: function () {
-      let element = $('.ant-drawer-wrapper-body')[0]
-      element.style.width = '400px'
     },
     drawPie: function () {
       let echartsPie = echarts.init(document.getElementById('echartsPie'))
@@ -229,6 +351,7 @@ export default {
         this.type = '玩'
         this.buttonContent += this.GLOBAL.FoldContentMountedNum
         setTimeout(function () {
+          that.addHeaderIcon()
           that.addButton()
         }, 20)
         break
@@ -236,37 +359,18 @@ export default {
         this.type = '吃'
         this.buttonContent += this.GLOBAL.FoldContentMountedNum
         setTimeout(function () {
-          that.addButton()
-        }, 20)
-        break
-      case 'wh':
-        this.type = '武汉'
-        this.buttonContent += this.GLOBAL.FoldContentMountedNum
-        setTimeout(function () {
-          that.addButton()
-        }, 20)
-        break
-      case 'gz':
-        this.type = '广州'
-        this.buttonContent += this.GLOBAL.FoldContentMountedNum
-        setTimeout(function () {
-          that.addButton()
-        }, 20)
-        break
-      case 'cs':
-        this.type = '长沙'
-        this.buttonContent += this.GLOBAL.FoldContentMountedNum
-        setTimeout(function () {
+          that.addHeaderIcon()
           that.addButton()
         }, 20)
         break
     }
-    if (this.GLOBAL.FoldContentMountedNum == 2) {
-      this.markerType = this.GLOBAL.icon1
+    // 添加按钮种类完成之后
+    if (this.GLOBAL.FoldContentMountedNum === 1) {
       setTimeout(function () {
         that.multMarker(that.GLOBAL.siteList)
       }, 100)
     }
+    this.typeProps = Object.keys(this.GLOBAL.siteList)
     this.GLOBAL.FoldContentMountedNum++
   }
 }
