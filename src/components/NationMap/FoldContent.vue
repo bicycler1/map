@@ -275,7 +275,6 @@ export default {
       setTimeout(function () {
         that.initRightDrawer()
         that.addPhotos(typeOrder, listOrder)
-        console.log(that.GLOBAL.photos)
       }, 100)
     },
     initRightDrawer: function () {

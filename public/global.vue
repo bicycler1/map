@@ -209,7 +209,7 @@ const Functions = {
     }
   },
   stop: function (ev) {
-    console.log('qq')
+    ev = ev || window.ev
     ev.stopPropagation()
     ev.preventDefault()
   },

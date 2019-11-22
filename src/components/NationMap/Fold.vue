@@ -96,7 +96,6 @@ export default {
       }
     },
     showImg: function (element) {
-      console.log(element)
       this.$emit('showImg', element)
     },
     mountedFunction: function () {

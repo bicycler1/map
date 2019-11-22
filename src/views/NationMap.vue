@@ -60,8 +60,8 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 300px;
-    margin-left: -150px;
+    width: 600px;
+    margin-left: -300px;
     height: 50px;
     font-size: 2rem;
     color:#fff;
@@ -83,7 +83,8 @@ export default {
       center: { lng: 112.20, lat: 31.03 },
       zoom: 6.5,
       photoUrl: '',
-      photoAlt: ''
+      photoAlt: '',
+      liElement: Object
     }
   },
   methods: {
@@ -96,22 +97,58 @@ export default {
         that.GLOBAL.zoom = that.GLOBAL.map.getZoom()
       }, 800)
     },
-    showImgKeys: function () {
-      console.log('11')
+    showImgKeys: function (ev, currentElement) {
+      ev = ev || window.ev
+      this.GLOBAL.Functions.stop(ev)
+      let Num = currentElement.parent().children().length
+      console.log(currentElement)
+      switch (ev.key) {
+        case 'ArrowRight':
+          // let nextNum = parseInt($(currentElement.children()[0]).attr('order'))+1
+          // if (nextNum >= Num) {
+          //   this.updatePhoto(0)
+          //   this.liElement = $(currentElement.parent().children()[0])
+          // }
+          // this.updatePhoto(nextNum)
+          // this.liElement = $(currentElement.parent().children()[nextNum])
+          break
+        case 'ArrowLeft':
+          // if ((parseInt(currentNum) - 1) < 0) {
+          //   this.updatePhoto(Num - 1)
+          //   this.liElement = $(element).parent().children()[Num - 1]
+          // }
+          // this.updatePhoto((currentNum - 1))
+          // this.liElement = $(element).parent().children()[currentNum - 1]
+          break
+        case 'Escape':
+          this.closeShowImg(event)
+          break
+        default:
+          break
+      }
     },
     closeShowImg: function (ev) {
       this.GLOBAL.Functions.stop(ev)
       $('.show-img').fadeOut(100)
     },
-    showImg: function (element) {
-      let photoOrder = $($(element).children()[0]).attr('order')
+    updatePhoto: function (photoOrder) {
       let keys = Object.keys(this.GLOBAL.photos)
       let photo = this.GLOBAL.photos[keys[photoOrder]]
       this.photoUrl = photo.url
       this.photoAlt = photo.alt
+    },
+    showImg: function (element) {
+      let that = this
+      this.liElement = element
+      let photoOrder = $(element.children()[0]).attr('order')
+      this.updatePhoto(photoOrder)
       $('.show-img').fadeIn(100)
-      console.log(document.getElementsByClassName('show-img'))
-      this.GLOBAL.Functions.addEvent(document, 'keyup', this.showImgKeys)
+      $(document).keyup(function (event) {
+        that.GLOBAL.Functions.stop(event)
+        console.log('11')
+        that.showImgKeys(event, that.liElement)
+      })
+      // this.GLOBAL.Functions.addEvent(document, 'keyup', this.showImgKeys(event))
     }
   },
   mounted () {
