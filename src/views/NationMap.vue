@@ -7,19 +7,24 @@
       </Fold>
     </div>
     <div class="show-img" @click="closeShowImg($event)">
-      <div></div>
-      <div></div>
+      <div @click="prePhoto($event,liElement)" @dblclick="stop($event)">
+        <a-icon type="caret-left" />
+      </div>
+      <div @click="nextPhoto($event,liElement)" @dblclick="stop($event)">
+        <a-icon type="caret-right" />
+      </div>
       <div>
         <img :src=photoUrl :alt=photoAlt @click="stop($event)">
       </div>
       <div @click="stop($event)">
         {{photoAlt}}
       </div>
+      <div></div>
     </div>
   </div>
 </template>
 
-<style scoped>
+<style lang="scss" scoped>
   #map{
     width: 100vw;
     height: 100vh;
@@ -38,6 +43,35 @@
     background: rgba(0,0,0,0.5);
     display: none;
     z-index: 2000;
+  }
+  @mixin iconPosition($type){
+    @if($type == 'left'){
+      left: 16%;
+    }
+    @else if($type == 'right'){
+      right: 16%
+    }
+    position: absolute;
+    top: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 65px;
+    height: 65px;
+    margin-top: -(65/2)px;
+    color: #ddd;
+    font-size: 6rem;
+    border-radius: 50%;
+    cursor: pointer;
+    &:hover{
+      background: rgba(0,0,0,0.6);
+    }
+  }
+  .show-img>div:nth-child(1){
+    @include  iconPosition(left)
+  }
+  .show-img>div:nth-child(2){
+    @include  iconPosition(right)
   }
   .show-img>div:nth-child(3){
     position: absolute;
@@ -84,7 +118,6 @@ export default {
       zoom: 6.5,
       photoUrl: '',
       photoAlt: '',
-      keyUpNum: 1,
       liElement: Object
     }
   },
@@ -98,26 +131,35 @@ export default {
         that.GLOBAL.zoom = that.GLOBAL.map.getZoom()
       }, 800)
     },
+    nextPhoto: function (ev,currentElement) {
+      this.stop(ev)
+      let Num = currentElement.parent().children().length
+      let nextNum = parseInt($(currentElement.children()[0]).attr('order')) + 1
+      if (nextNum >= Num) {
+        nextNum = 0
+      }
+      this.updatePhoto(nextNum)
+      this.liElement = $(currentElement.parent().children()[nextNum])
+    },
+    prePhoto: function (ev,currentElement) {
+      this.stop(ev)
+      let Num = currentElement.parent().children().length
+      let preNum = parseInt($(currentElement.children()[0]).attr('order')) - 1
+      if (preNum < 0) {
+        preNum = Num - 1
+      }
+      this.updatePhoto(preNum)
+      this.liElement = $(currentElement.parent().children()[preNum])
+    },
     showImgKeys: function (ev, currentElement) {
       ev = ev || window.ev
-      this.GLOBAL.Functions.stop(ev)
-      let Num = currentElement.parent().children().length
+      this.stop(ev)
       switch (ev.key) {
         case 'ArrowRight':
-          let nextNum = parseInt($(currentElement.children()[0]).attr('order')) + 1
-          if (nextNum >= Num) {
-            nextNum = 0
-          }
-          this.updatePhoto(nextNum)
-          this.liElement = $(currentElement.parent().children()[nextNum])
+          this.nextPhoto(ev,currentElement)
           break
         case 'ArrowLeft':
-          let preNum = parseInt($(currentElement.children()[0]).attr('order')) - 1
-          if (preNum < 0) {
-            preNum = Num - 1
-          }
-          this.updatePhoto(preNum)
-          this.liElement = $(currentElement.parent().children()[preNum])
+          this.prePhoto(ev,currentElement)
           break
         case 'Escape':
           this.closeShowImg(event)
