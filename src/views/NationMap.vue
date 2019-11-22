@@ -84,6 +84,7 @@ export default {
       zoom: 6.5,
       photoUrl: '',
       photoAlt: '',
+      keyUpNum: 1,
       liElement: Object
     }
   },
@@ -101,24 +102,22 @@ export default {
       ev = ev || window.ev
       this.GLOBAL.Functions.stop(ev)
       let Num = currentElement.parent().children().length
-      console.log(currentElement)
       switch (ev.key) {
         case 'ArrowRight':
-          // let nextNum = parseInt($(currentElement.children()[0]).attr('order'))+1
-          // if (nextNum >= Num) {
-          //   this.updatePhoto(0)
-          //   this.liElement = $(currentElement.parent().children()[0])
-          // }
-          // this.updatePhoto(nextNum)
-          // this.liElement = $(currentElement.parent().children()[nextNum])
+          let nextNum = parseInt($(currentElement.children()[0]).attr('order')) + 1
+          if (nextNum >= Num) {
+            nextNum = 0
+          }
+          this.updatePhoto(nextNum)
+          this.liElement = $(currentElement.parent().children()[nextNum])
           break
         case 'ArrowLeft':
-          // if ((parseInt(currentNum) - 1) < 0) {
-          //   this.updatePhoto(Num - 1)
-          //   this.liElement = $(element).parent().children()[Num - 1]
-          // }
-          // this.updatePhoto((currentNum - 1))
-          // this.liElement = $(element).parent().children()[currentNum - 1]
+          let preNum = parseInt($(currentElement.children()[0]).attr('order')) - 1
+          if (preNum < 0) {
+            preNum = Num - 1
+          }
+          this.updatePhoto(preNum)
+          this.liElement = $(currentElement.parent().children()[preNum])
           break
         case 'Escape':
           this.closeShowImg(event)
@@ -143,12 +142,13 @@ export default {
       let photoOrder = $(element.children()[0]).attr('order')
       this.updatePhoto(photoOrder)
       $('.show-img').fadeIn(100)
+      $(document).unbind('keyup')
       $(document).keyup(function (event) {
-        that.GLOBAL.Functions.stop(event)
-        console.log('11')
         that.showImgKeys(event, that.liElement)
       })
-      // this.GLOBAL.Functions.addEvent(document, 'keyup', this.showImgKeys(event))
+      // this.GLOBAL.Functions.addEvent(document, 'keyup', function (event) {
+      //   console.log('11')
+      // })
     }
   },
   mounted () {
