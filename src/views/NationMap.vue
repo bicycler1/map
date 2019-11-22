@@ -7,11 +7,15 @@
       </Fold>
     </div>
     <div class="show-img" @click="closeShowImg($event)">
-      <div @click="prePhoto($event,liElement)" @dblclick="stop($event)">
-        <a-icon type="caret-left" />
-      </div>
-      <div @click="nextPhoto($event,liElement)" @dblclick="stop($event)">
-        <a-icon type="caret-right" />
+      <div>
+        <div class="left-icon" @click="prePhoto($event,liElement)" @dblclick="stop($event)">
+          <a-icon type="caret-left" />
+        </div>
+        <i class="fa fa-minus minus-icon" aria-hidden="true" @click="minusPhoto($event,0.05)"></i>
+        <i class="fa fa-plus plus-icon" aria-hidden="true" @click="plusPhoto($event,0.05)"></i>
+        <div class="right-icon" @click="nextPhoto($event,liElement)" @dblclick="stop($event)">
+          <a-icon type="caret-right" />
+        </div>
       </div>
       <div>
         <img :src=photoUrl :alt=photoAlt @click="stop($event)">
@@ -44,52 +48,51 @@
     display: none;
     z-index: 2000;
   }
-  @mixin iconPosition($type){
-    @if($type == 'left'){
-      left: 16%;
-    }
-    @else if($type == 'right'){
-      right: 16%
-    }
+  .show-img>div:nth-child(1){
     position: absolute;
-    top: 50%;
+    bottom: 5%;
+    left: 50%;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    width: 300px;
+    height: 60px;
+    margin-left: -150px;
+  }
+  @mixin iconStyle(){
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 65px;
-    height: 65px;
-    margin-top: -(65/2)px;
+    width: 39px;
+    height: 39px;
     color: #ddd;
-    font-size: 6rem;
+    font-size: 3rem;
     border-radius: 50%;
     cursor: pointer;
     &:hover{
       background: rgba(0,0,0,0.6);
     }
   }
-  .show-img>div:nth-child(1){
-    @include  iconPosition(left)
+  .left-icon,.right-icon,.minus-icon,.plus-icon{
+    @include iconStyle
   }
   .show-img>div:nth-child(2){
-    @include  iconPosition(right)
-  }
-  .show-img>div:nth-child(3){
     position: absolute;
     top: 6%;
     left: 50%;
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 80%;
+    height: 73%;
     width: 900px;
     margin-left: -450px;
   }
   .show-img img{
     max-height: 100%;
   }
-  .show-img>div:nth-child(4){
+  .show-img>div:nth-child(3){
     position: absolute;
-    bottom: 5%;
+    bottom: 15%;
     left: 50%;
     display: flex;
     justify-content: center;
@@ -131,7 +134,24 @@ export default {
         that.GLOBAL.zoom = that.GLOBAL.map.getZoom()
       }, 800)
     },
-    nextPhoto: function (ev,currentElement) {
+    showImgKeys: function (ev, currentElement) {
+      ev = ev || window.ev
+      this.stop(ev)
+      switch (ev.key) {
+        case 'ArrowRight':
+          this.nextPhoto(ev, currentElement)
+          break
+        case 'ArrowLeft':
+          this.prePhoto(ev, currentElement)
+          break
+        case 'Escape':
+          this.closeShowImg(event)
+          break
+        default:
+          break
+      }
+    },
+    nextPhoto: function (ev, currentElement) {
       this.stop(ev)
       let Num = currentElement.parent().children().length
       let nextNum = parseInt($(currentElement.children()[0]).attr('order')) + 1
@@ -141,7 +161,7 @@ export default {
       this.updatePhoto(nextNum)
       this.liElement = $(currentElement.parent().children()[nextNum])
     },
-    prePhoto: function (ev,currentElement) {
+    prePhoto: function (ev, currentElement) {
       this.stop(ev)
       let Num = currentElement.parent().children().length
       let preNum = parseInt($(currentElement.children()[0]).attr('order')) - 1
@@ -151,32 +171,9 @@ export default {
       this.updatePhoto(preNum)
       this.liElement = $(currentElement.parent().children()[preNum])
     },
-    showImgKeys: function (ev, currentElement) {
-      ev = ev || window.ev
-      this.stop(ev)
-      switch (ev.key) {
-        case 'ArrowRight':
-          this.nextPhoto(ev,currentElement)
-          break
-        case 'ArrowLeft':
-          this.prePhoto(ev,currentElement)
-          break
-        case 'Escape':
-          this.closeShowImg(event)
-          break
-        default:
-          break
-      }
-    },
     closeShowImg: function (ev) {
       this.GLOBAL.Functions.stop(ev)
       $('.show-img').fadeOut(100)
-    },
-    updatePhoto: function (photoOrder) {
-      let keys = Object.keys(this.GLOBAL.photos)
-      let photo = this.GLOBAL.photos[keys[photoOrder]]
-      this.photoUrl = photo.url
-      this.photoAlt = photo.alt
     },
     showImg: function (element) {
       let that = this
@@ -191,6 +188,50 @@ export default {
       // this.GLOBAL.Functions.addEvent(document, 'keyup', function (event) {
       //   console.log('11')
       // })
+    },
+    updatePhoto: function (photoOrder) {
+      let keys = Object.keys(this.GLOBAL.photos)
+      let photo = this.GLOBAL.photos[keys[photoOrder]]
+      this.photoUrl = photo.url
+      this.photoAlt = photo.alt
+    },
+    minusPhoto: function (ev, zoomTimes) {
+      this.stop(ev)
+      let photo = $($('.show-img').children()[1]).children()[0]
+      let photoWidth = parseInt($(photo).css('width'))
+      let photoHeight = parseInt($(photo).css('height'))
+      let newPhotoWidth = photoWidth * (1 - zoomTimes)
+      let newPhotoHeight = photoHeight * (1 - zoomTimes)
+      console.log($(document).height())
+      if (($(document).height() - (newPhotoHeight + 39 + 50)) < 500) {
+        if (photoWidth > photoHeight) {
+          $($('.show-img').children()[1]).css({'width': newPhotoWidth + 'px'})
+          $($('.show-img').children()[1]).css({'marginLeft': -(newPhotoWidth / 2) + 'px'})
+        } else if (photoHeight >= photoWidth) {
+          $($('.show-img').children()[1]).css({'height': newPhotoHeight + 'px'})
+        }
+      }
+    },
+    plusPhoto: function (ev, zoomTimes) {
+      this.stop(ev)
+      let photo = $($('.show-img').children()[1]).children()[0]
+      let photoWidth = parseInt($(photo).css('width'))
+      let photoHeight = parseInt($(photo).css('height'))
+      let newPhotoWidth = photoWidth * (1 + zoomTimes)
+      let newPhotoHeight = photoHeight * (1 + zoomTimes)
+      console.log($(document).height())
+      if (($(document).height() - (newPhotoHeight + 39 + 50)) > 200) {
+        if (photoWidth > photoHeight) {
+          $($('.show-img').children()[1]).css({ 'width': newPhotoWidth + 'px' })
+          $($('.show-img').children()[1]).css({ 'marginLeft': -(newPhotoWidth / 2) + 'px' })
+        } else if (photoHeight >= photoWidth) {
+          $($('.show-img').children()[1]).css({ 'height': newPhotoHeight + 'px' })
+        }
+      }
+
+      console.log(photoWidth, photoHeight)
+      console.log(newPhotoWidth, newPhotoHeight)
+      console.log(parseInt($(photo).css('width')), parseInt($(photo).css('height')))
     }
   },
   mounted () {
