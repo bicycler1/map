@@ -10,7 +10,9 @@ let FoldChildButtonHeight = []
 let FoldChildVisib = []
 
 // galleryInit在右侧栏图片更新时候使用
+let gallery = Object
 let galleryInit = 1
+let photos = Object
 
 // 百度地图相关变量
 let map = Object
@@ -199,12 +201,17 @@ const iconEatActive = new BMap.Icon(require('../src/assets/nationMap/markerEat.p
 })
 
 const Functions = {
-  addEvent: function (obj, xEvent, fn) {
+  addEvent: function (obj, xEvent, fn, eventType = false) {
     if (obj.attachEvent) {
       obj.attachEvent('on' + xEvent, fn)
     } else {
-      obj.addEventListener(xEvent, fn, false)
+      obj.addEventListener(xEvent, fn, eventType)
     }
+  },
+  stop: function (ev) {
+    console.log('qq')
+    ev.stopPropagation()
+    ev.preventDefault()
   },
   panAndZoom: function (point) {
     let that = this
@@ -260,6 +267,8 @@ export default {
   FoldContentMountedNum,
   FoldChildButtonHeight,
   FoldChildVisib,
+  photos,
+  gallery,
   galleryInit,
   map,
   siteList,

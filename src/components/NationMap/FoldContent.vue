@@ -19,8 +19,8 @@
       </p>
       <div>
         <ul id="images">
-          <li v-for="(value,key,index) in photos">
-            <img :src=value.url :alt=value.alt>
+          <li v-for="(value,key,index) in this.photos">
+            <img :order=index :src=value.url :alt=value.alt @click="showImg($event)">
           </li>
         </ul>
       </div>
@@ -112,14 +112,13 @@ export default {
       butType: [' btn-primary', ' btn-success', ' btn-info', ' btn-warning', ' btn-danger', ' btn-default'],
       rightDrawerVisible: false,
       photos: Object,
-      describeContent: String,
-      gallery: Object,
+      describeContent: String
     }
   },
   methods: {
     // 折叠操作，传入参数是事件绑定的对象
     foldChild: function (ev) {
-      let element = ev.currentTarget || ev.srcElement
+      let element = ev.currentTarget || ev.srcElement.parentNode
       let num = parseInt($(element).next().attr('id').replace(/[^0-9]/ig, ''))
       let foldElement = $(element).next()
       if (this.GLOBAL.FoldChildVisib[num] === 0) {
@@ -156,6 +155,10 @@ export default {
         $(parent).append('<button type="button" class="button-margin ' + className + '"' + 'id="button' + i + '"' + '>' + contents[i] + '</button>')
         $(parent + ' #button' + i).on('click', function () {
           that.deletAndMarker(that.buttonContent.replace(/[^0-9]/ig, ''), i)
+          // if (that.GLOBAL.galleryInit > 1) {
+          //   that.GLOBAL.gallery=''
+          //   that.GLOBAL.galleryInit = 1
+          // }
           that.showDrawer(that.buttonContent.replace(/[^0-9]/ig, ''), i)
         })
       }
@@ -272,32 +275,34 @@ export default {
       setTimeout(function () {
         that.initRightDrawer()
         that.addPhotos(typeOrder, listOrder)
+        console.log(that.GLOBAL.photos)
       }, 100)
     },
     initRightDrawer: function () {
       let that = this
       let element = $('.ant-drawer-content-wrapper')
       element.css({ width: '430px' })
-      if (this.GLOBAL.galleryInit === 1) {
-        // 初始化viewerjs，同时setTimeOut保证接下来的函数在that.addPhotos(parentOrder, i)函数之后执行
-        setTimeout(() => {
-          that.gallery = new Viewer(document.getElementById('images'), {
-            toolbar: true,
-            tooltip: false,
-            movable: true,
-            rotatable: true,
-            scalable: false,
-            fullscreen: false,
-            minZoomRatio: 0.03, // 最小缩放比例
-            maxZoomRatio: 3 // 最大缩放比例
-          })
-          that.GLOBAL.galleryInit++
-        }, 0)
-      } else {
-        setTimeout(() => {
-          that.gallery.update()
-        }, 0)
-      }
+      // if (this.GLOBAL.galleryInit === 1) {
+      //   // 初始化viewerjs，同时setTimeOut保证接下来的函数在that.addPhotos(parentOrder, i)函数之后执行
+      //   setTimeout(() => {
+      //     that.GLOBAL.gallery = new Viewer(document.getElementById('images'), {
+      //       toolbar: true,
+      //       tooltip: false,
+      //       movable: true,
+      //       rotatable: true,
+      //       scalable: false,
+      //       fullscreen: false,
+      //       minZoomRatio: 0.03, // 最小缩放比例
+      //       maxZoomRatio: 3 // 最大缩放比例
+      //     })
+      //     that.GLOBAL.galleryInit++
+      //   }, 0)
+      // } else {
+      //   setTimeout(() => {
+      //     console.log('gengxin')
+      //     that.GLOBAL.gallery.update()
+      //   }, 0)
+      // }
       // this.drawPie()
     },
     addPhotos: function (typeOrder, listOrder) {
@@ -307,13 +312,19 @@ export default {
       if (this.GLOBAL.siteList[this.typeProps[typeOrder]].hasOwnProperty('photos')) {
         let photoAll = this.GLOBAL.siteList[this.typeProps[typeOrder]].photos
         let propsChild = Object.keys(photoAll)
-        this.photos = photoAll[propsChild[listOrder]]
+        this.GLOBAL.photos = photoAll[propsChild[listOrder]]
+        this.photos=this.GLOBAL.photos
       }
       if (this.GLOBAL.siteList[this.typeProps[typeOrder]].hasOwnProperty('describeContent')) {
         let describeAll = this.GLOBAL.siteList[this.typeProps[typeOrder]].describeContent
         let propsChild = Object.keys(describeAll)
         this.describeContent = describeAll[propsChild[listOrder]]
       }
+    },
+    showImg:function(ev){
+      let element = ev.currentTarget || ev.srcElement
+      element=$(element).parent()
+      this.$emit('showImg',element)
     },
     rightDrawerClose: function () {
       this.rightDrawerVisible = false

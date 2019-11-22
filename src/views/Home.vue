@@ -128,12 +128,8 @@ export default {
     }
   },
   methods: {
-    stop: function (ev) {
-      ev.stopPropagation()
-      ev.preventDefault()
-    },
     movezzhhDown: function (ev) {
-      this.stop(ev)
+      this.GLOBAL.Functions.stop(ev)
       this.ifMouseDown = true
       let elementClass = (ev.target || ev.srcElement).parentNode.className
       if (elementClass.indexOf('hh') != -1) {

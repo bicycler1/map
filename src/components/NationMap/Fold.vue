@@ -5,8 +5,8 @@
       <a-icon id="icon" :type=iconType />
     </div>
     <div class="fold-content">
-      <FoldContent class="fold-child-frame" name="trip" @foldChild="foldChild()"></FoldContent>
-      <FoldContent class="fold-child-frame" name="eat" @foldChild="foldChild()"></FoldContent>
+      <FoldContent class="fold-child-frame" name="trip" @foldChild="foldChild" @showImg="showImg($event)"></FoldContent>
+      <FoldContent class="fold-child-frame" name="eat" @foldChild="foldChild" @showImg="showImg($event)"></FoldContent>
     </div>
   </div>
 </template>
@@ -94,6 +94,10 @@ export default {
         this.iconType = 'down'
         foldElement.css({ 'height': 0 + 'px' })
       }
+    },
+    showImg: function (element) {
+      console.log(element)
+      this.$emit('showImg', element)
     },
     mountedFunction: function () {
       switch (this.type) {
