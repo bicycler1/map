@@ -13,6 +13,7 @@
         </div>
         <i class="fa fa-minus minus-icon" aria-hidden="true" @click="minusPhoto($event,0.05)"></i>
         <i class="fa fa-plus plus-icon" aria-hidden="true" @click="plusPhoto($event,0.05)"></i>
+        <i class="fa fa-repeat repeat-icon" aria-hidden="true" @click="repeatPhotoFun($event)"></i>
         <div class="right-icon" @click="nextPhoto($event,liElement)" @dblclick="stop($event)">
           <a-icon type="caret-right" />
         </div>
@@ -73,7 +74,7 @@
       background: rgba(0,0,0,0.6);
     }
   }
-  .left-icon,.right-icon,.minus-icon,.plus-icon{
+  .left-icon,.right-icon,.minus-icon,.plus-icon,.repeat-icon{
     @include iconStyle
   }
   .show-img>div:nth-child(2){
@@ -121,7 +122,9 @@ export default {
       zoom: 6.5,
       photoUrl: '',
       photoAlt: '',
-      liElement: Object
+      liElement: Object,
+      isZoom: false,
+      repeatPhoto: Object
     }
   },
   methods: {
@@ -137,6 +140,7 @@ export default {
     showImgKeys: function (ev, currentElement) {
       ev = ev || window.ev
       this.stop(ev)
+      this.repeatPhotoFun('')
       switch (ev.key) {
         case 'ArrowRight':
           this.nextPhoto(ev, currentElement)
@@ -153,6 +157,7 @@ export default {
     },
     nextPhoto: function (ev, currentElement) {
       this.stop(ev)
+      this.repeatPhotoFun('')
       let Num = currentElement.parent().children().length
       let nextNum = parseInt($(currentElement.children()[0]).attr('order')) + 1
       if (nextNum >= Num) {
@@ -163,6 +168,7 @@ export default {
     },
     prePhoto: function (ev, currentElement) {
       this.stop(ev)
+      this.repeatPhotoFun('')
       let Num = currentElement.parent().children().length
       let preNum = parseInt($(currentElement.children()[0]).attr('order')) - 1
       if (preNum < 0) {
@@ -174,6 +180,7 @@ export default {
     closeShowImg: function (ev) {
       this.GLOBAL.Functions.stop(ev)
       $('.show-img').fadeOut(100)
+      this.repeatPhotoFun('')
     },
     showImg: function (element) {
       let that = this
@@ -198,40 +205,62 @@ export default {
     minusPhoto: function (ev, zoomTimes) {
       this.stop(ev)
       let photo = $($('.show-img').children()[1]).children()[0]
+      let divWidth = parseInt($($('.show-img').children()[1]).css('width'))
+      let divHeight = parseInt($($('.show-img').children()[1]).css('height'))
       let photoWidth = parseInt($(photo).css('width'))
       let photoHeight = parseInt($(photo).css('height'))
+      if (!this.isZoom) {
+        this.isZoom = true
+        this.repeatPhoto.divWidth = divWidth
+        this.repeatPhoto.divHeight = divHeight
+        this.repeatPhoto.photowidth = photoWidth
+        this.repeatPhoto.photoheight = photoHeight
+      }
       let newPhotoWidth = photoWidth * (1 - zoomTimes)
       let newPhotoHeight = photoHeight * (1 - zoomTimes)
-      console.log($(document).height())
       if (($(document).height() - (newPhotoHeight + 39 + 50)) < 500) {
-        if (photoWidth > photoHeight) {
-          $($('.show-img').children()[1]).css({'width': newPhotoWidth + 'px'})
-          $($('.show-img').children()[1]).css({'marginLeft': -(newPhotoWidth / 2) + 'px'})
-        } else if (photoHeight >= photoWidth) {
-          $($('.show-img').children()[1]).css({'height': newPhotoHeight + 'px'})
-        }
+        $($($('.show-img').children()[1]).children()[0]).css({ 'width': newPhotoWidth + 'px' })
+        $($($('.show-img').children()[1]).children()[0]).css({ 'height': newPhotoHeight + 'px' })
       }
     },
     plusPhoto: function (ev, zoomTimes) {
       this.stop(ev)
       let photo = $($('.show-img').children()[1]).children()[0]
+      let divWidth = parseInt($($('.show-img').children()[1]).css('width'))
+      let divHeight = parseInt($($('.show-img').children()[1]).css('height'))
       let photoWidth = parseInt($(photo).css('width'))
       let photoHeight = parseInt($(photo).css('height'))
+      if (!this.isZoom) {
+        this.isZoom = true
+        this.repeatPhoto.divWidth = divWidth
+        this.repeatPhoto.divHeight = divHeight
+        this.repeatPhoto.photowidth = photoWidth
+        this.repeatPhoto.photoheight = photoHeight
+      }
       let newPhotoWidth = photoWidth * (1 + zoomTimes)
       let newPhotoHeight = photoHeight * (1 + zoomTimes)
-      console.log($(document).height())
+      let newDivWidth = divWidth * (1 + zoomTimes)
+      let newDivHeight = divHeight * (1 + zoomTimes)
       if (($(document).height() - (newPhotoHeight + 39 + 50)) > 200) {
-        if (photoWidth > photoHeight) {
-          $($('.show-img').children()[1]).css({ 'width': newPhotoWidth + 'px' })
-          $($('.show-img').children()[1]).css({ 'marginLeft': -(newPhotoWidth / 2) + 'px' })
-        } else if (photoHeight >= photoWidth) {
-          $($('.show-img').children()[1]).css({ 'height': newPhotoHeight + 'px' })
-        }
+        $($('.show-img').children()[1]).css({ 'width': newDivWidth + 'px' })
+        $($('.show-img').children()[1]).css({ 'marginLeft': -(newDivWidth / 2) + 'px' })
+        $($($('.show-img').children()[1]).children()[0]).css({ 'width': newPhotoWidth + 'px' })
+        $($($('.show-img').children()[1]).children()[0]).css({ 'height': newPhotoHeight + 'px' })
       }
-
-      console.log(photoWidth, photoHeight)
-      console.log(newPhotoWidth, newPhotoHeight)
-      console.log(parseInt($(photo).css('width')), parseInt($(photo).css('height')))
+    },
+    repeatPhotoFun: function (ev) {
+      if (ev !== '') {
+        this.stop(ev)
+      }
+      if (this.isZoom) {
+        console.log('11')
+        $($('.show-img').children()[1]).css({ 'width': this.repeatPhoto.divWidth + 'px' })
+        $($('.show-img').children()[1]).css({ 'marginLeft': -(this.repeatPhoto.divWidth / 2) + 'px' })
+        $($('.show-img').children()[1]).css({ 'height': this.repeatPhoto.divHeight + 'px' })
+        $($($('.show-img').children()[1]).children()[0]).css({ 'width': 'auto' })
+        $($($('.show-img').children()[1]).children()[0]).css({ 'height': 'auto' })
+        this.isZoom = false
+      }
     }
   },
   mounted () {
