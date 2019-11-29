@@ -90,6 +90,7 @@
   }
   .show-img img{
     max-height: 100%;
+    transition: all .6s ease-in-out;
   }
   .show-img>div:nth-child(3){
     position: absolute;
@@ -244,6 +245,8 @@ export default {
       if (($(document).height() - (newPhotoHeight + 39 + 50)) > 200) {
         $($('.show-img').children()[1]).css({ 'width': newDivWidth + 'px' })
         $($('.show-img').children()[1]).css({ 'marginLeft': -(newDivWidth / 2) + 'px' })
+        $($('.show-img').children()[1]).css({ 'height': newDivHeight + 'px' })
+        $($('.show-img').children()[1]).css({ 'marginTop': -((newDivHeight-divHeight) / 2) + 'px' })
         $($($('.show-img').children()[1]).children()[0]).css({ 'width': newPhotoWidth + 'px' })
         $($($('.show-img').children()[1]).children()[0]).css({ 'height': newPhotoHeight + 'px' })
       }
@@ -257,6 +260,7 @@ export default {
         $($('.show-img').children()[1]).css({ 'width': this.repeatPhoto.divWidth + 'px' })
         $($('.show-img').children()[1]).css({ 'marginLeft': -(this.repeatPhoto.divWidth / 2) + 'px' })
         $($('.show-img').children()[1]).css({ 'height': this.repeatPhoto.divHeight + 'px' })
+        $($('.show-img').children()[1]).css({ 'marginTop': '0px' })
         $($($('.show-img').children()[1]).children()[0]).css({ 'width': 'auto' })
         $($($('.show-img').children()[1]).children()[0]).css({ 'height': 'auto' })
         this.isZoom = false
